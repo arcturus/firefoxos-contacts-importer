@@ -152,7 +152,6 @@ google.contacts = function contacts() {
 
   var fetchContacts = function getContacts() {
     var url = GOOGLE_URL.replace('%ACCESS_TOKEN%', google.auth.getAccessToken());
-    console.log(url);
 
     var xhr = new XMLHttpRequest({mozAnon: true, mozSystem: true});
     xhr.open('GET', url, true);
@@ -261,7 +260,6 @@ google.contacts = function contacts() {
         }
       })
     }
-    console.log('I\'ve got ' + contactsToImport.length + ' contacts to import');
 
     var contactsSaver = new ContactsSaver(contactsToImport);
     contactsSaver.start();

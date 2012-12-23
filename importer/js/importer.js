@@ -10,10 +10,8 @@ document.getElementById('importGoogle').addEventListener(
     if (window.location.port != '') {
       port = ':' + window.location.port;
     }
-    console.log('FJJ Asking google: ' + googleAuth);
     authWindow = window.open(googleAuth);
     window.addEventListener('message', function onMessage(evt) {
-      console.log('-----> Got ' + evt.data.access_token);
       authWindow.close();
 
       menu.classList.add('hide');
