@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Importer</title>
+  <link rel="stylesheet" href="style/style.css">
+
+  <script defer src="js/importer.js"></script>
+  <script defer src="js/google/import.js"></script>
+</head>
+<body role="application">
+
+  <section id="importer-menu" role="region" class="skin-dark">
+    <header>
+      <h1>Importer</h1>
+    </header>
+    <p>
+      <h2 class="bb-docs">Importing contacts from Google</h2>
+    </p>
+    <p class="container">
+      <button class="affirmative" id="importGoogle">Import from Google</button>
+    </p>
+  </section>
+
+  <section id="google-contacts" role="region" class="skin-dark hide">
+    <header>
+      <h1>Importer</h1>
+    </header>
+    <p id='progress' data-theme="dark" role="status">
+      <progress></progress>
+      <span>Loading contacts from server</span>
+    </p>
+    <div id='import' class='container hide'>
+      <h2 class='bb-docs'></h2>
+      <button id='importButton'>Import all contacts</button>
+    </div>
+    <div id='importWithPhone' class='container hide'>
+      <button id='importWithPhoneButton'>Import contacts with phone</button>
+    </div>
+
+    <div id='import_progress' class='container hide'>
+      <h2 class='bb-docs'>Importing contacts</h2>
+      <p data-theme="dark" role="status">
+        <span>0%</span>
+        <progress max="100" value="0"></progress>
+      </p>
+      <button onclick='google.ui.showImportedContacts()' class='hide'> Show imported contacts</button>
+    </div>
+
+    <ul id='contactsList' class='hide'>
+      
+    </ul>
+  </section>
+
+</body>
+</html>

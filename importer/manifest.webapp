@@ -1,0 +1,18 @@
+{
+  "name": "Importer",
+  "description": "Import your contacts to Firefox OS",
+  "launch_path": "/index.html",
+  "type": "certified",
+  "developer": {
+    "name": "Francisco Jordano",
+    "url": "https://github.com/arcturus/firefoxos-contacts-importer"
+  },
+  "permissions": {
+    "contacts":{ "access": "readwrite" },
+    "systemXHR": {}
+  },
+  "default_locale": "en-US",
+  "icons": {
+    "128": "/style/icons/Blank.png"
+  }
+}
