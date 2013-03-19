@@ -18,6 +18,7 @@ document.getElementById('importGoogle').addEventListener(
       gContacts.classList.remove('hide');
       
       google.auth.init(evt.data.access_token);
+
       google.contacts.fetchContacts();
     });
 });

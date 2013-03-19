@@ -101,7 +101,7 @@ google.auth = function auth() {
     var theUrl = googleUrl(url);
 
     request.open('GET', theUrl, true);
-    request.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+    request.setRequestHeader('Authorization', 'OAuth ' + accessToken);
     request.setRequestHeader('Gdata-version', '3.0');
     request.withCredentials = 'true';
     request.onload = function loaded() {
@@ -148,13 +148,18 @@ google.contacts = function contacts() {
 
   var contacts = [];
   var contactsToImport = [];
-  var GOOGLE_URL = 'https://www.google.com/m8/feeds/contacts/default/full?access_token=%ACCESS_TOKEN%&start-index=1&max-results=10000';
+  var GOOGLE_URL = 'https://www.google.com/m8/feeds/contacts/default/full?max-results=10000';
+  var GD_NAMESPACE = 'http://schemas.google.com/g/2005';
+  var CATEGORY = 'gmail';
+  var URN_IDENTIFIER = 'urn:service:gmail:uid:';
 
   var fetchContacts = function getContacts() {
-    var url = GOOGLE_URL.replace('%ACCESS_TOKEN%', google.auth.getAccessToken());
+    var url = GOOGLE_URL;
 
     var xhr = new XMLHttpRequest({mozAnon: true, mozSystem: true});
     xhr.open('GET', url, true);
+    xhr.setRequestHeader('Authorization', 'OAuth ' + google.auth.getAccessToken());
+    xhr.setRequestHeader('Gdata-version', '3.0');
     xhr.addEventListener('load', function dataLoaded(e) {
       if (xhr.status == 200 || xhr.status == 0) {
         parseContacts(xhr.responseXML);
@@ -170,83 +175,177 @@ google.contacts = function contacts() {
     var contactsEntries = responseXML.querySelectorAll('entry');
     for (var i = 0; i < contactsEntries.length; i++) {
       var entry = contactsEntries[i];
-      var contact = {};
-      var name = entry.querySelector('title');
-      var phoneNumber = entry.querySelector('phoneNumber');
-      var email = entry.querySelector('email');
-      var company = entry.querySelector('orgName');
-
-      if (name) {
-        parseName(name.textContent, contact);
-      }
-      if (phoneNumber) {
-        parsePhoneNumber(phoneNumber.textContent, contact);
-      }
-      if (email) {
-        parseEmail(email.getAttribute('address'), contact);
-      }
-      if (company) {
-        parseOrg(company.textContent, contact);
-      }
-
-      contacts.push(contact);
-
+      contacts.push(gContactToJson(entry));
     }
-
   };
 
-  var parseName = function parseName(name, contact) {
-    contact.name = [name];
-    var nameParts = name.split(' ');
-    if (nameParts.length == 1) {
-      contact.givenName = nameParts;
-    } else if (nameParts.length == 2) {
-      contact.givenName = [nameParts[0]];
-      contact.familyName = [nameParts[1]];
+  var getValueForNode = function getValueForNode(doc, name, def) {
+    var defaultValue = def || '';
+
+    if (doc == null || name == null) {
+      return defaultValue;
+    }
+
+    var node = doc.querySelector(name);
+
+    if (node && node.textContent) {
+      return node.textContent;
+    }
+
+    return defaultValue;
+  };
+
+  var gContactToJson = function gContactToJson(googleContact) {
+    var output = {};
+
+    // This field will be needed for indexing within the
+    // import process, not for the api
+    output.uid = getUid(googleContact);
+
+    output.name = getValueForNode(googleContact, 'title');
+
+    // Store the photo url, not in the contact itself
+    var photoUrl = googleContact.querySelector('link[type="image/*"]');
+    if (photoUrl) {
+      photoUrl = photoUrl.getAttribute('href');
     } else {
-      contact.givenName = [nameParts[0]];
-      contact.additionalName = [nameParts[1]];
-      contact.familyName = [nameParts.slice(2).join(' ')];
+      // No image link
+      photoUrl = '';
     }
-  };
 
-  var parsePhoneNumber = function parsePhoneNumber(rawPhone, contact) {
-    var phones = Array.isArray(rawPhone) ? rawPhone : [rawPhone];
-
-    contact.tel = [];
-    for(var i = 0; i < phones.length; i++) {
-      var originalPhone = phones[i];
-      var phone = {
-        'value': originalPhone,
-        'carrier': null,
-        'type': 'mobile' //Add a default value :(
-      };
-      contact.tel.push(phone);
-    }
-  };
-
-  var parseEmail = function parseEmail(rawEmail, contact) {
-    var emails = Array.isArray(rawEmail) ? rawEmail : [rawEmail];
-
-    contact.email = [];
-    for(var i = 0; i < emails.length; i++) {
-      var originalEmail = emails[i];
-      var email = {
-        'value': originalEmail,
-        'type': 'personal' // Default value
+    var name = googleContact.querySelector('name');
+    if (name) {
+      var contactName = getValueForNode(name, 'givenName');
+      if (contactName) {
+        output.givenName = [contactName];
       }
-      contact.email.push(email);
+      var contactFamilyName = getValueForNode(name, 'familyName');
+      if (contactFamilyName) {
+        output.familyName = [contactFamilyName];
+      }
+      var contactSuffix = getValueForNode(name, 'additionalName');
+      if (contactSuffix) {
+        output.additionalName = [contactSuffix];
+      }
     }
+
+    output.email = parseEmails(googleContact);
+
+    output.adr = parseAddress(googleContact);
+
+    output.tel = parsePhones(googleContact);
+
+    var org = googleContact.querySelector('organization');
+    if (org) {
+      output.org = [getValueForNode(org, 'orgName')];
+      output.jobTitle = [getValueForNode(org, 'orgTitle')];
+    }
+
+    var bday = googleContact.querySelector('birthday');
+    if (bday) {
+      output.bday = new Date(bday.getAttribute('when'));
+    }
+
+    var content = googleContact.querySelector('content');
+    if (content) {
+      output.note = [content.textContent];
+    }
+
+    output.category = [CATEGORY];
+    output.url = [{
+      type: ['source'],
+      value: getContactURI(output)
+    }];
+
+    return output;
   };
 
-  var parseOrg = function parseOrg(rawOrg, contact) {
-    var orgs = Array.isArray(rawOrg) ? rawOrg : [rawOrg];
+  var getContactURI = function getContactURI(contact) {
+    return URN_IDENTIFIER + contact.uid;
+  };
 
-    contact.org = [];
-    for(var i = 0; i < orgs.length; i++) {
-      contact.org.push(orgs[i]);
+  // This will be a full url like:
+  // http://www.google.com/m8/feeds/contacts/<email>/base/<contact_id>
+  // for a specific contact node
+  var getUid = function getUid(contact) {
+    return contact.querySelector('id').textContent;
+  };
+
+  // Returns an array with the possible emails found in a contact
+  // as a ContactField format
+  var parseEmails = function parseEmails(googleContact) {
+    var DEFAULT_EMAIL_TYPE = 'personal';
+    var emails = [];
+    var fields = googleContact.getElementsByTagNameNS(GD_NAMESPACE,
+      'email');
+    if (fields && fields.length > 0) {
+      for (var i = 0; i < fields.length; i++) {
+        var emailField = fields.item(i);
+
+        // Type format: rel="http://schemas.google.com/g/2005#home"
+        var type = emailField.getAttribute('rel') || DEFAULT_EMAIL_TYPE;
+        if (type.indexOf('#') > -1) {
+          type = type.substr(type.indexOf('#') + 1);
+        }
+
+        emails.push({
+          'type': type,
+          'value': emailField.getAttribute('address')
+        });
+      }
     }
-  }
+
+    return emails;
+  };
+
+  // Given a google contact returns an array of ContactAddress
+  var parseAddress = function parseAddress(googleContact) {
+    var addresses = [];
+    var fields = googleContact.getElementsByTagNameNS(GD_NAMESPACE,
+      'structuredPostalAddress');
+    if (fields && fields.length > 0) {
+      for (var i = 0; i < fields.length; i++) {
+        var field = fields.item(i);
+        var address = {};
+
+        address.streetAddress = getValueForNode(field, 'street');
+        address.locality = getValueForNode(field, 'city');
+        address.region = getValueForNode(field, 'region');
+        address.postalCode = getValueForNode(field, 'postcode');
+        address.countryName = getValueForNode(field, 'country');
+
+        addresses.push(address);
+      }
+    }
+    return addresses;
+  };
+
+  // Given a google contact this function returns an array of
+  // ContactField with the pones stored for that contact
+  var parsePhones = function parsePhones(googleContact) {
+    var DEFAULT_PHONE_TYPE = 'personal';
+    var phones = [];
+    var fields = googleContact.getElementsByTagNameNS(GD_NAMESPACE,
+      'phoneNumber');
+    if (fields && fields.length > 0) {
+      for (var i = 0; i < fields.length; i++) {
+        var field = fields.item(i);
+
+        // Type format: rel="http://schemas.google.com/g/2005#home"
+        var type = field.getAttribute('rel') || DEFAULT_PHONE_TYPE;
+        if (type.indexOf('#') > -1) {
+          type = type.substr(type.indexOf('#') + 1);
+        }
+
+        phones.push({
+          'type': type,
+          'value': field.textContent
+        });
+      }
+    }
+
+    return phones;
+  };
 
   var importContacts = function importContacts(onlyWithPhone) {
     google.ui.showImporting();
