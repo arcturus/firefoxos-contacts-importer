@@ -3,6 +3,10 @@
 <head>
   <meta charset="utf-8">
   <title>Importer</title>
+  <link rel="stylesheet" href="style/headers.css">
+  <link rel="stylesheet" href="style/buttons.css">
+  <link rel="stylesheet" href="style/confirm.css">
+  <link rel="stylesheet" href="style/progress_activity.css">
   <link rel="stylesheet" href="style/style.css">
 
   <script defer src="js/importer.js"></script>
@@ -10,16 +14,18 @@
 </head>
 <body role="application">
 
-  <section id="importer-menu" role="region" class="skin-dark">
+  <section id="importer-menu" role="region">
     <header>
-      <h1>Importer</h1>
+      <h1>Contacts Importer</h1>
     </header>
-    <p>
-      <h2 class="bb-docs">Importing contacts from Google</h2>
-    </p>
-    <p class="container">
-      <button class="affirmative" id="importGoogle">Import from Google</button>
-    </p>
+    <article class="banner">
+      <h2>Welcome</h2>
+      <p>Contacts importer provides an easy way to import your contacts from Google and merge them with the ones in your phone.</p>
+    </article>
+    <article>
+      <button id="importGoogle">Connect with Google</button>
+      <p>To start the process you must first log in to your Google account</p>
+    </article>
   </section>
 
   <section id="google-contacts" role="region" class="skin-dark hide">
