@@ -191,6 +191,7 @@ google.contacts = function contacts() {
       // No image link
       photoUrl = '';
     }
+    output.photoUrl = photoUrl;
 
     var name = googleContact.querySelector('name');
     if (name) {
@@ -329,7 +330,7 @@ google.contacts = function contacts() {
   var importContacts = function importContacts() {
     google.ui.showImporting();
 
-    var contactsSaver = new ContactsSaver(contacts);
+    var contactsSaver = new ContactsSaver(contacts, google.auth.getAccessToken());
     contactsSaver.start();
     var self = this;
 
@@ -361,11 +362,12 @@ google.contacts = function contacts() {
 }();
 
 /* Based on the UI tests */
-function ContactsSaver(data) {
+function ContactsSaver(data, at) {
   this.data = data;
   var next = 0;
   var canceled = false;
   var self = this;
+  var access_token = at;
 
   this.start = function() {
     saveContact(data[0]);
@@ -375,22 +377,70 @@ function ContactsSaver(data) {
     canceled = true;
   };
 
+  function fetchImage(uri, contact, callback) {
+    var xhr = new XMLHttpRequest({
+      mozSystem: true
+    });
+
+    if (!uri || uri.length == 0) {
+      callback(contact);
+      return;
+    }
+
+    uri += '?access_token=' + access_token;
+
+    xhr.open('GET', uri, true);
+    xhr.responseType = 'blob';
+    xhr.timeout = 3000;
+
+    xhr.setRequestHeader('Authorization', 'OAuth ' + access_token);
+    xhr.setRequestHeader('Gdata-version', '3.0');
+
+    xhr.onload = function(e) {
+      if (xhr.status === 200 || xhr.status === 400 || xhr.status === 0) {
+        contact.photo = [xhr['response']];
+        callback(contact);
+      }
+      else {
+        // Error asking for the url
+        console.error('HTTP error executing GET. ',
+                           uri, ' Status: ', xhr.status);
+        callback(contact);
+      }
+    }; // onload
+
+    xhr.ontimeout = function(e) {
+      callback(contact);
+    }; // ontimeout
+
+    xhr.onerror = function(e) {
+      console.error('Error while executing HTTP GET: ', uri,
+                               ': ', e);
+      callback(contact);
+    }; // onerror
+
+    xhr.send();
+  };
+
   function saveContact(cdata) {
     var contact = new mozContact();
-    contact.init(cdata);
-    var req = navigator.mozContacts.save(contact);
-    req.onsuccess = function(e) {
-      if (typeof self.onsaved === 'function') {
-        self.onsaved(contact);
-      }
-      continuee();
-    };
 
-    req.onerror = function(e) {
-      if (typeof self.onerror === 'function') {
-        self.onerror(self.data[next], e.target.error);
-      }
-    };
+    contact.init(cdata);
+    fetchImage(cdata.photoUrl, contact, function onImage(c) {
+      var req = navigator.mozContacts.save(c);
+      req.onsuccess = function(e) {
+        if (typeof self.onsaved === 'function') {
+          self.onsaved(c);
+        }
+        continuee();
+      };
+
+      req.onerror = function(e) {
+        if (typeof self.onerror === 'function') {
+          self.onerror(self.data[next], e.target.error);
+        }
+      };
+    });
   }
 
   function continuee() {
