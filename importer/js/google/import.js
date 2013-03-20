@@ -17,6 +17,10 @@ google.ui = function ui() {
   });
   var cancelButton = document.getElementById('cancel-import');
   cancelButton.addEventListener('click', cancelImport);
+  var goBackButton = document.getElementById('cancel-contacts');
+  goBackButton.addEventListener('click', function(evt) {
+    goHome(evt);
+  });
 
   var showContactsParsed = function showContactsParsed(num) {
     document.getElementById('progress').classList.add('hide');
@@ -61,6 +65,11 @@ google.ui = function ui() {
     document.getElementById('import_progress').classList.remove('hide');
 
     google.contacts.cancelImport();
+  };
+
+  var goHome = function goHome(evt) {
+    document.getElementById('importer-menu').classList.remove('hide');
+    document.getElementById('google-contacts').classList.add('hide');
   };
 
   return {
