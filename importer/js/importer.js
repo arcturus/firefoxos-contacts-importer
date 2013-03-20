@@ -24,5 +24,3 @@ document.getElementById('importGoogle').addEventListener(
 });
 
 document.getElementById('importButton').addEventListener('click', function(evt) { google.contacts.importContacts(); });
-document.getElementById('importWithPhoneButton').addEventListener('click', function(evt) { google.contacts.importContacts(true); });
-document.getElementById('showImportedButton').addEventListener('click', function(evt) { google.ui.showImportedContacts(); });

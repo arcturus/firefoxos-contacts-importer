@@ -51,12 +51,10 @@ google.ui = function ui() {
     importButton.disabled = num == 0 ? 'disabled' : false;
 
     document.getElementById('import').classList.remove('hide');
-    document.getElementById('importWithPhone').classList.remove('hide');
   }
 
   var showImporting = function showImporting() {
     document.getElementById('import').classList.add('hide');
-    document.getElementById('importWithPhone').classList.add('hide');
     document.getElementById('import_progress').classList.remove('hide');
 
     setTimeout(google.ui.updateStatus, 1000);
