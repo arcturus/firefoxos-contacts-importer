@@ -128,12 +128,43 @@ google.contacts = function contacts() {
   var contacts = [];
   var contactsToImport = [];
   var GOOGLE_URL = 'https://www.google.com/m8/feeds/contacts/default/full?max-results=10000';
+  var GROUPS_END_POINT = 'https://www.google.com/m8/feeds/groups/default/full/';
   var GD_NAMESPACE = 'http://schemas.google.com/g/2005';
   var CATEGORY = 'gmail';
   var URN_IDENTIFIER = 'urn:service:gmail:uid:';
 
-  var fetchContacts = function getContacts() {
+  var fetchContacts = function fetchContact() {
+    var xhr = new XMLHttpRequest({mozAnon: true, mozSystem: true});
+    xhr.open('GET', GROUPS_END_POINT, true);
+    xhr.setRequestHeader('Authorization', 'OAuth ' + google.auth.getAccessToken());
+    xhr.setRequestHeader('Gdata-version', '3.0');
+    xhr.addEventListener('load', function dataLoaded(e) {
+      if (xhr.status == 200 || xhr.status == 0) {
+        var feed = xhr.responseXML.getElementsByTagName('feed')[0];
+        if (feed === null) {
+          getContactsByGroup();
+          return;
+        }
+
+        var sgc = feed.querySelector('systemGroup[id="Contacts"]');
+        if (sgc !== null) {
+          var id = sgc.parentNode.querySelector('id').textContent;
+          getContactsByGroup(id);  
+        } else {
+          getContactsByGroup();
+        }
+      } else {
+        getContactsByGroup();
+      }
+    });
+    xhr.send(null);
+  };
+
+  var getContactsByGroup = function getContactsByGroup(groupId) {
     var url = GOOGLE_URL;
+    if (groupId) {
+      url += '&group=' + groupId;
+    }
 
     var xhr = new XMLHttpRequest({mozAnon: true, mozSystem: true});
     xhr.open('GET', url, true);
@@ -402,9 +433,6 @@ function ContactsSaver(data, at) {
         callback(contact);
       }
       else {
-        // Error asking for the url
-        console.error('HTTP error executing GET. ',
-                           uri, ' Status: ', xhr.status);
         callback(contact);
       }
     }; // onload
@@ -414,8 +442,6 @@ function ContactsSaver(data, at) {
     }; // ontimeout
 
     xhr.onerror = function(e) {
-      console.error('Error while executing HTTP GET: ', uri,
-                               ': ', e);
       callback(contact);
     }; // onerror
 
