@@ -27,19 +27,19 @@ google.ui = function ui() {
       if (contact.tel) {
         subtitle = contact.tel[0].value;
       }
-      
+
       if (subtitle == '' && contact.email && !showingEmail) {
         subtitle = contact.email[0].value;
       }
       li.dataset['tag'] = i % 2 == 0 ? 'A' : 'B';
       li.dataset['state'] = 'tagged';
-      var img = '<img/>';      
+      var img = '<img/>';
       li.innerHTML = img + '<dl><dt>' + title + '</dt><dd>' + subtitle + '</dd></dl>';
 
       container.appendChild(li);
     }
 
-    document.getElementById('progress').classList.add('hide');    
+    document.getElementById('progress').classList.add('hide');
     document.getElementById('contactsList').classList.remove('hide');
   };
 
@@ -51,7 +51,7 @@ google.ui = function ui() {
     importButton.disabled = num == 0 ? 'disabled' : false;
 
     document.getElementById('import').classList.remove('hide');
-  }
+  };
 
   var showImporting = function showImporting() {
     document.getElementById('import').classList.add('hide');
@@ -60,10 +60,15 @@ google.ui = function ui() {
     setTimeout(google.ui.updateStatus, 1000);
   };
 
+  var finishImporting = function hideImporting() {
+    document.getElementById('import_progress').classList.add('hide');
+    document.getElementById('importer-finish').classList.remove('hide');
+  };
+
   var updateStatus = function updateStatus() {
-    var total = google.contacts.getContactsToImport().length;
+    var total = google.contacts.getContacts().length;
     var imported = global.imported;
-    var percentage = Math.floor(imported * 100 / total);
+    var percentage = parseInt(Math.floor(imported * 100 / total));
 
     progressText.innerHTML = percentage + ' %';
     progressBar.value = percentage;
@@ -71,22 +76,16 @@ google.ui = function ui() {
     if (percentage != 100) {
       setTimeout(updateStatus, 1000);
     } else {
-      document.querySelector('#import_progress button').classList.remove('hide');
+      setTimeout(finishImporting, 1000);
     }
 
-  };
-
-  var showImportedContacts = function showImportedContacts() {
-    document.getElementById('import_progress').classList.add('hide');
-    printContacts(google.contacts.getContactsToImport());
-    document.getElementById('contactsList').classList.remove('hide');
   };
 
   return {
     'showContactsParsed': showContactsParsed,
     'showImporting': showImporting,
     'updateStatus': updateStatus,
-    'showImportedContacts': showImportedContacts
+    'finishImporting': finishImporting
   };
 
 }();
@@ -133,13 +132,13 @@ google.auth = function auth() {
     theUrl += 'access_token=' + encodeURIComponent(accessToken);
 
     return theUrl;
-  }
+  };
 
   return {
     'init': init,
     'getAccessToken': getAccessToken,
     'googleUrl': googleUrl
-  }
+  };
 }();
 
 google.contacts = function contacts() {
@@ -345,48 +344,33 @@ google.contacts = function contacts() {
     return phones;
   };
 
-  var importContacts = function importContacts(onlyWithPhone) {
+  var importContacts = function importContacts() {
     google.ui.showImporting();
 
-    contactsToImport = contacts;
-    if (onlyWithPhone) {
-      contactsToImport = [];
-      contacts.forEach(function onlyWithPhone(contact) {
-        if (contact.hasOwnProperty('tel') && contact.tel.length > 0) {
-          contactsToImport.push(contact);
-        }
-      })
-    }
-
-    var contactsSaver = new ContactsSaver(contactsToImport);
+    var contactsSaver = new ContactsSaver(contacts);
     contactsSaver.start();
     var self = this;
+
     contactsSaver.onsaved = function(c) {
       global.imported++;
     };
     contactsSaver.onerror = function(c, e) {
       global.imported++;
       console.log('Error importing ' + e);
-    }
+    };
   };
 
   // All contacts
   var getContacts = function getContacts() {
     return contacts;
-  }
-
-  // Just the subset to be imported
-  var getContactsToImport = function getContactsToImport() {
-    return contactsToImport;
-  }
+  };
 
   return {
     'parseContacts': parseContacts,
     'fetchContacts': fetchContacts,
     'importContacts': importContacts,
-    'getContacts': getContacts,
-    'getContactsToImport': getContactsToImport
-  }
+    'getContacts': getContacts
+  };
 }();
 
 /* Based on the UI tests */
@@ -397,7 +381,7 @@ function ContactsSaver(data) {
 
   this.start = function() {
     saveContact(data[0]);
-  }
+  };
 
   function saveContact(cdata) {
     var contact = new mozContact();
@@ -408,13 +392,13 @@ function ContactsSaver(data) {
         self.onsaved(contact);
       }
       continuee();
-    }
+    };
 
     req.onerror = function(e) {
       if (typeof self.onerror === 'function') {
         self.onerror(self.data[next], e.target.error);
       }
-    }
+    };
   }
 
   function continuee() {
