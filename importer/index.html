@@ -18,44 +18,75 @@
     <header>
       <h1>Contacts Importer</h1>
     </header>
-    <article class="banner">
-      <h2>Welcome</h2>
-      <p>Contacts importer provides an easy way to import your contacts from Google and merge them with the ones in your phone.</p>
-    </article>
     <article>
+      <div class="banner">
+        <h2>Welcome</h2>
+        <p>Contacts importer provides an easy way to import your contacts from Google and merge them with the ones in your phone.</p>
+      </div>
       <button id="importGoogle">Connect with Google</button>
       <p>To start the process you must first log in to your Google account</p>
     </article>
   </section>
 
-  <section id="google-contacts" role="region" class="skin-dark hide">
+  <section id="google-contacts" role="region" class="hide">
     <header>
-      <h1>Importer</h1>
+      <button id="cancel-contacts"><span class="icon icon-close">close</span></button>
+      <h1>Contacts Importer</h1>
     </header>
-    <p id='progress' data-theme="dark" role="status">
-      <progress></progress>
-      <span>Loading contacts from server</span>
-    </p>
-    <div id='import' class='container hide'>
-      <h2 class='bb-docs'></h2>
-      <button id='importButton'>Import all contacts</button>
-    </div>
-    <div id='importWithPhone' class='container hide'>
+
+    <form id="progress" role="dialog" data-type="confirm">
+      <section>
+        <h1>Retrieving contacts from Google</h1>
+        <p>
+          <progress></progress>
+        </p>
+      </section>
+      <menu>
+        <button class="full">Cancel</button>
+      </menu>
+    </form>
+
+    <article id='import' class='hide'>
+      <div class="banner">
+        <h2></h2>
+      </div>
+      <button id='importButton'>Import contacts</button>
+      <p>Copy all the contacts retrieved from Google to your phone</p>
+    </article>
+    <!--article id='importWithPhone' class='hide'>
       <button id='importWithPhoneButton'>Import contacts with phone</button>
-    </div>
+    </article-->
 
-    <div id='import_progress' class='container hide'>
-      <h2 class='bb-docs'>Importing contacts</h2>
-      <p data-theme="dark" role="status">
-        <span>0%</span>
-        <progress max="100" value="0"></progress>
-      </p>
-      <button id="showImportedButton" class='hide'>Show imported contacts</button>
-    </div>
+    <form id="import_progress" role="dialog" data-type="confirm" class='hide'>
+      <section>
+        <h1>Importing contacts to your phone</h1>
+        <p role="status">
+          <span>80%</span>
+          <progress value="80" max="100"></progress>
+        </p>
+      </section>
+      <menu>
+        <button class="full">Cancel</button>
+      </menu>
+    </form>
 
-    <ul id='contactsList' class='hide'>
-      
-    </ul>
+    <!--button id="showImportedButton" class='hide'>Show imported contacts</button-->
+
+    <!--ul id='contactsList' class='hide'></ul-->
+  </section>
+
+  <section id="importer-finish" role="region" class="hide">
+    <header>
+      <button id="cancel-finish"><span class="icon icon-close">close</span></button>
+      <h1>Contacts Importer</h1>
+    </header>
+    <article>
+      <div class="banner">
+        <h2>Congratulations!</h2>
+        <p>All your contacts from Google have been succesfully imported to your phone.</p>
+      </div>
+      <p><strong>Use your default contacts app to check and edit the contacts in your phone.</strong></p>
+    </article>
   </section>
 
 </body>

@@ -10,25 +10,37 @@ html, body {
   font-family: "MozTT", Sans-serif;
 }
 
-#importer-menu > article {
-  padding: 1.5rem;
+section[role="region"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fff;
 }
 
-#importer-menu > article.banner {
-  margin: 0.5rem 1.5rem 1rem 1.5rem;
+section[role="region"] > article {
   padding: 1.5rem;
+  height: calc(100% - 8rem);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+section[role="region"] > article .banner {
+  margin: 0.5rem 0 2.5rem 0;
+  padding: 0 1.5rem 1.5rem 1.5rem;
   border-bottom: 0.1rem solid #dcdcdc;
 }
 
-#importer-menu > article h2 {
-  font-size: 3.7rem;
-  line-height: 3.7rem;
+section[role="region"] > article h2 {
+  font-size: 3.4rem;
+  line-height: 3.5rem;
   color: #464646;
   font-weight: 500;
   margin: 0 0 0.5rem 0;
 }
 
-#importer-menu > article p {
+section[role="region"] > article p {
   font-size: 1.6rem;
   line-height: 1.8rem;
   color: #a8a8a8;
@@ -37,11 +49,28 @@ html, body {
   padding: 0;
 }
 
-#importer-menu > article.banner p {
+section[role="region"] > article .banner p {
   font-size: 1.8rem;
   line-height: 2.7rem;
   color: #7a7979;
   font-weight: normal;
 }
 
+section[role="region"] > article p strong {
+  font-size: 1.8rem;
+  line-height: 2.7rem;
+  color: #7a7979;
+  font-weight: normal;
+  padding: 0 1.5rem;
+  display: block;
+}
+
+[data-type="confirm"] p {
+  text-align: center;
+}
+
+#google-contacts > article h2 {
+  font-size: 25px;
+  line-height: 27px;
+}
 
