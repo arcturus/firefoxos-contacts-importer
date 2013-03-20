@@ -11,37 +11,10 @@ google.ui = function ui() {
 
   var progressBar = document.querySelector('#import_progress progress');
   var progressText = document.querySelector('#import_progress span');
-
-  var printContacts = function printContacts(contactsList) {
-    var container = document.getElementById('contactsList');
-    for (var i = 0; i < contactsList.length; i++) {
-      var contact = contactsList[i];
-      var li = document.createElement('li');
-      var title = contact.name;
-      var showingEmail = false;
-      if (!title && contact.email) {
-        title = contact.email[0].value;
-        showingEmail = true;
-      }
-      var subtitle = '';
-      if (contact.tel) {
-        subtitle = contact.tel[0].value;
-      }
-
-      if (subtitle == '' && contact.email && !showingEmail) {
-        subtitle = contact.email[0].value;
-      }
-      li.dataset['tag'] = i % 2 == 0 ? 'A' : 'B';
-      li.dataset['state'] = 'tagged';
-      var img = '<img/>';
-      li.innerHTML = img + '<dl><dt>' + title + '</dt><dd>' + subtitle + '</dd></dl>';
-
-      container.appendChild(li);
-    }
-
-    document.getElementById('progress').classList.add('hide');
-    document.getElementById('contactsList').classList.remove('hide');
-  };
+  var finishButton = document.getElementById('importer-finish');
+  finishButton.addEventListener('click', function onClick(evt) {
+    window.close();
+  });
 
   var showContactsParsed = function showContactsParsed(num) {
     document.getElementById('progress').classList.add('hide');
