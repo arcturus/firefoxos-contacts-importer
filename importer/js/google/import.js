@@ -15,6 +15,8 @@ google.ui = function ui() {
   finishButton.addEventListener('click', function onClick(evt) {
     window.close();
   });
+  var cancelButton = document.getElementById('cancel-import');
+  cancelButton.addEventListener('click', cancelImport);
 
   var showContactsParsed = function showContactsParsed(num) {
     document.getElementById('progress').classList.add('hide');
@@ -52,6 +54,13 @@ google.ui = function ui() {
       setTimeout(finishImporting, 1000);
     }
 
+  };
+
+  var cancelImport = function cancelImport() {
+    document.getElementById('import').classList.add('hide');
+    document.getElementById('import_progress').classList.remove('hide');
+
+    google.contacts.cancelImport();
   };
 
   return {
@@ -338,11 +347,16 @@ google.contacts = function contacts() {
     return contacts;
   };
 
+  var cancelImport = function cancelImport() {
+
+  };
+
   return {
     'parseContacts': parseContacts,
     'fetchContacts': fetchContacts,
     'importContacts': importContacts,
-    'getContacts': getContacts
+    'getContacts': getContacts,
+    'cancelImport': cancelImport
   };
 }();
 
@@ -350,10 +364,15 @@ google.contacts = function contacts() {
 function ContactsSaver(data) {
   this.data = data;
   var next = 0;
+  var canceled = false;
   var self = this;
 
   this.start = function() {
     saveContact(data[0]);
+  };
+
+  this.cancel = function() {
+    canceled = true;
   };
 
   function saveContact(cdata) {
@@ -375,6 +394,9 @@ function ContactsSaver(data) {
   }
 
   function continuee() {
+    if (canceled) {
+      return;
+    }
     next++;
     if (next < self.data.length) {
       saveContact(self.data[next]);
