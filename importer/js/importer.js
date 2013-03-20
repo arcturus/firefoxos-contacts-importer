@@ -14,9 +14,14 @@ document.getElementById('importGoogle').addEventListener(
     window.addEventListener('message', function onMessage(evt) {
       authWindow.close();
 
+      if (evt.data.error) {
+        //Cancelled, we could show a message
+        return;
+      }
+
       menu.classList.add('hide');
       gContacts.classList.remove('hide');
-      
+
       google.auth.init(evt.data.access_token);
 
       google.contacts.fetchContacts();
