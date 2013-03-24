@@ -29,6 +29,9 @@ google.ui = function ui() {
     var importButton = document.querySelector('#import button');
     importButton.disabled = num == 0 ? 'disabled' : false;
 
+    if (localStorage['alreadyImported'] == 1) {
+      document.getElementById('message').classList.remove('hide');
+    }
     document.getElementById('import').classList.remove('hide');
   };
 
@@ -40,6 +43,7 @@ google.ui = function ui() {
   };
 
   var finishImporting = function hideImporting() {
+    localStorage['alreadyImported'] = 1;
     document.getElementById('import_progress').classList.add('hide');
     document.getElementById('importer-finish').classList.remove('hide');
   };
