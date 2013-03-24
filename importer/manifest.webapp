@@ -13,6 +13,7 @@
   },
   "default_locale": "en-US",
   "icons": {
-    "128": "/style/icons/Blank.png"
+    "60": "/style/icons/icon.png",
+    "120": "/style/icons/icon.png"
   }
 }
