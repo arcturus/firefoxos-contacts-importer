@@ -195,6 +195,7 @@ google.contacts = function contacts() {
   };
 
   var parseContacts = function parseContacts(responseXML) {
+    contacts = [];
     var contactsEntries = responseXML.querySelectorAll('entry');
     for (var i = 0; i < contactsEntries.length; i++) {
       var entry = contactsEntries[i];
