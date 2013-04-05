@@ -2,7 +2,7 @@
   "name": "Importer",
   "description": "Import your contacts to Firefox OS",
   "launch_path": "/index.html",
-  "type": "certified",
+  "type": "privileged",
   "developer": {
     "name": "Francisco Jordano",
     "url": "https://github.com/arcturus/firefoxos-contacts-importer"
