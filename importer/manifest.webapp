@@ -8,12 +8,17 @@
     "url": "https://github.com/arcturus/firefoxos-contacts-importer"
   },
   "permissions": {
-    "contacts":{ "access": "readwrite" },
-    "systemXHR": {}
+    "contacts":{ 
+      "description": "Contacts permissions is required to write contact from Google to your Firefox OS phone",
+      "access": "readwrite" },
+    "systemXHR": {
+      "description": "This permission is require to contact Google serves"
+    }
   },
   "default_locale": "en-US",
   "icons": {
     "60": "/style/icons/icon.png",
-    "120": "/style/icons/icon.png"
+    "120": "/style/icons/icon.png",
+    "128": "/style/icons/icon.png"
   }
 }
