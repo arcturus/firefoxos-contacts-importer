@@ -372,8 +372,32 @@ google.contacts = function contacts() {
     return phones;
   };
 
+  var deleteContacts = function(result) {
+    var onsuccess = function() {};
+    var onerror = function() {};
+    for (var i = 0; i < result.length; ++i) {
+      var req = navigator.mozContacts.remove(result[i]);
+      req.onsuccess = onsuccess;
+      req.onerror = onerror;
+    }
+  }
+
+  var deleteContactsFromPhone = function() {
+    var req = navigator.mozContacts.find({});
+    req.onsuccess = function() {
+        deleteContacts(req.result);
+    }
+  }
+
   var importContacts = function importContacts() {
     google.ui.showImporting();
+
+    //This will happend if someone wants to delete old the old contacts and
+    //just sync with google contacts, delete the rest
+    var deleteContacts = document.getElementById('delete-old-contacts').checked;
+    if(deleteContacts) {
+      deleteContactsFromPhone();
+    }
 
     var contactsSaver = new ContactsSaver(contacts, google.auth.getAccessToken());
     contactsSaver.start();

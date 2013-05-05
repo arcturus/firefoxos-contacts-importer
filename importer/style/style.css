@@ -85,3 +85,17 @@ section[role="region"] > article p strong {
   padding: 1.5rem;
   color: rgb(51, 51, 51);
 }
+
+.warning {
+    padding-top: 5px;
+    padding-bottom: 10px;
+}
+
+.warning label {
+  font-size: 20px;
+  padding-right: 10px;
+}
+
+.warning p {
+  color: #e74c3c !important;
+}
