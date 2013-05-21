@@ -5,10 +5,10 @@ Import your contacts from different sources to Firefox OS.
 
 # How to make it work
 
-The contacts API in FirefoxOS requires some privileges to work, as well any app that uses it.
-You can check the permissions matrix ('https://docs.google.com/spreadsheet/ccc?key=0Akyz_Bqjgf5pdENVekxYRjBTX0dCXzItMnRyUU1RQ0E#gid=0')
-So far, I'm not able to create a priviledge app, so it's a _certified_ one, which means you'll
-need to build and flash a gaia version that contains this app.
+1. Clone the repository
+2. In the [Firefox OS Simulator](https://addons.mozilla.org/en-US/firefox/addon/firefox-os-simulator/) -> 'Add folder' -> Select the manifest file
+3. Enable remote debugging (Settings -> Device Information -> Developer) on your device
+4. Click the [Push](https://hacks.mozilla.org/2013/03/firefox-os-simulator-previewing-version-3-0/) to device button
 
 # Import contacts from Google
 
