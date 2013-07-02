@@ -20,5 +20,10 @@
     "60": "/style/icons/icon.png",
     "120": "/style/icons/icon.png",
     "128": "/style/icons/icon.png"
-  }
+  },
+  "redirects": [
+    {"from": "http://redirector.cloudfoundry.com/redirect.html",
+     "to": "/redirect.html"}
+  ],
+  "version": "1.0.1"
 }
