@@ -22,8 +22,8 @@
     "128": "/style/icons/icon.png"
   },
   "redirects": [
-    {"from": "http://redirector.cloudfoundry.com/redirect.html",
+    {"from": "http://postmessageitor.eu01.aws.af.cm/",
      "to": "/redirect.html"}
   ],
-  "version": "1.0.1"
+  "version": "1.0.2"
 }
