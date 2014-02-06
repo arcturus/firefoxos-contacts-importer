@@ -20,3 +20,7 @@ address and so on.
 
 This application WON'T modify your contacts in Google Contacts, as well as other contacts
 that you may have already saved on your Firefox OS contacts list.
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/arcturus/firefoxos-contacts-importer/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
